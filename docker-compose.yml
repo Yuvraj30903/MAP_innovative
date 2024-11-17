@@ -1,0 +1,47 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: sys
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on: 
+      - discovery-server
+    ports:
+      - "8080:8080"
+  book-service:
+    build: ./book-service
+    container_name: book-service
+    depends_on:
+      - mysql
+      - discovery-server
+    expose:
+      - "8081"
+  discovery-server:
+    build: ./discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+  book-recommandation-service:
+    build: ./book-recommandation-service
+    container_name: book-recommandation-service
+    expose:
+      - "8082"
+    depends_on: 
+      - discovery-server
+      - api-gateway
+  book-inventory-service:
+    build: ./book-inventory-service
+    container_name: book-inventory-service
+    expose:
+      - "8083"
+    
+    depends_on: 
+      - discovery-server
